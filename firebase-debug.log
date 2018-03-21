@@ -1,0 +1,28 @@
+[debug] [2017-08-04T17:41:34.241Z] ----------------------------------------------------------------------
+[debug] [2017-08-04T17:41:34.243Z] Command:      /usr/local/bin/node /usr/local/bin/firebase serve
+[debug] [2017-08-04T17:41:34.244Z] CLI Version:  3.9.1
+[debug] [2017-08-04T17:41:34.244Z] Platform:     darwin
+[debug] [2017-08-04T17:41:34.244Z] Node Version: v6.10.3
+[debug] [2017-08-04T17:41:34.245Z] Time:         Fri Aug 04 2017 11:41:34 GMT-0600 (MDT)
+[debug] [2017-08-04T17:41:34.245Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2017-08-04T17:41:34.263Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2017-08-04T17:41:34.264Z] > authorizing via signed-in user
+[debug] [2017-08-04T17:41:34.266Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/teaching-project-ce98b  
+ Fri Aug 04 2017 11:41:34 GMT-0600 (MDT)
+[debug] [2017-08-04T17:41:37.004Z] <<< HTTP RESPONSE 200
+[debug] [2017-08-04T17:41:37.007Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/teaching-project-ce98b/tokens  
+ Fri Aug 04 2017 11:41:37 GMT-0600 (MDT)
+[debug] [2017-08-04T17:41:38.426Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/Users/cmacdonald/Project/Presentaion'...
+[info] 
+[debug] [2017-08-04T17:41:38.430Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/teaching-project-ce98b  
+ Fri Aug 04 2017 11:41:38 GMT-0600 (MDT)
+[debug] [2017-08-04T17:41:39.418Z] <<< HTTP RESPONSE 200
+[debug] [2017-08-04T17:41:39.418Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/289051909036/clients/_:getWebAppConfig  
+ Fri Aug 04 2017 11:41:39 GMT-0600 (MDT)
+[debug] [2017-08-04T17:41:40.773Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: ./
+[info] ✔  hosting: Local server: http://localhost:5000
+

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Nulli Notes</title>
+    <meta name="description" content="Nulli Notes description">
+
+    <!-- See https://goo.gl/OOhYW5 -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Chrome -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Nulli Notes">
+    <link rel="icon"
+      sizes="192x192"
+      href="images/icons/web-icon.png">
+
+
+    <!-- Mobile Safari -->
+    <link rel="apple-touch-icon" href="images/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#46c7e4">
+    <meta name="apple-mobile-web-app-title" content="Nulli Notes">
+    <meta name="viewport" content="width=device-width">
+
+
+    <!-- Windows -->
+    <meta name="msapplication-TileColor" content="#46c7e4">
+
+
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="bower_components/platinum-sw/platinum-sw-elements.html">
+    <link rel="import" href="bower_components/polymerfire/polymerfire.html">
+    <link rel="import" href="/src/nullinote-app/nullinote-app.html">
+    <link rel="import" href="/src/nullinote-app/nullinote-elements.html">
+  </head>
+  <body>
+
+    <platinum-sw-register
+        auto-register
+        skip-waiting
+        clients-claim
+        reload-on-install
+        href="/sw-import.js"
+        on-service-worker-error="displayInstalledToastError">
+      <platinum-sw-cache
+          default-cache-strategy="fastest">
+      </platinum-sw-cache>
+    </platinum-sw-register>
+
+    <firebase-app
+      name="notes"
+      api-key="AIzaSyAUKhiUFdFDZdsDDeQfI5nzC--xG442otQ",
+      auth-domain="teaching-project-ce98b.firebaseapp.com",
+      database-url="https://teaching-project-ce98b.firebaseio.com">
+    </firebase-app>
+
+    <nullinote-app></nullinote-app>
+  </body>
+</html>
