@@ -1,0 +1,89 @@
+
+<link rel="import" href="nullinote-elements.html">
+
+<dom-module id="nullinote-editor">
+  <template>
+    <style>
+      :host {
+        position: absolute;
+        overflow: hidden;
+        top: 46px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      paper-button {
+        color: black;
+      }
+
+      .controls {
+        display: block;
+        position: relative;
+        margin: 10px auto;
+        width: calc(95% - 10px);
+        max-width: 480px;
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        justify-content: space-between;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+
+
+      paper-dialog {
+        width: 50vw;
+        min-width: 165px;
+        height: auto;
+      }
+
+    </style>
+    <paper-dialog id="editNote" modal center>
+      <nullinote-note id="note" title="{{note.title}}" body="{{note.body}}" editable></nullinote-note>
+      <div class="controls">
+        <paper-button raised on-tap="delete">Delete</paper-button>
+        <paper-button raised on-tap="save" style="background-color: #0266C8">Done</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script>
+    class NullinoteEditor extends Polymer.Element {
+      static get is() { return 'nullinote-editor'; }
+      static get properties() {
+        return {
+          note: {
+            type: Object,
+            notify: true
+          },
+        }
+      }
+
+      open(noteElement) { // Opens old note
+        if (noteElement) {
+          this.$.editNote.open();
+        } else {
+          this.create();
+        }
+      }
+
+      create() { // Creates new note
+        this.note = { title: '', body: '' };
+        this.$.editNote.open();
+      }
+
+      save() {
+        this.close('save');
+      }
+
+      delete() {
+        this.close('delete');
+      }
+
+      close(detail) { // Fire custom close event with save or delete detail
+        this.$.editNote.close();
+        this.dispatchEvent(new CustomEvent('close', {detail: detail}));
+      }
+    }
+    window.customElements.define(NullinoteEditor.is, NullinoteEditor);
+  </script>
+</dom-module>

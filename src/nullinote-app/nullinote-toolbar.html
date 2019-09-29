@@ -1,0 +1,90 @@
+<link rel="import" href="nullinote-elements.html">
+
+<dom-module id="nullinote-toolbar">
+  <template>
+    <style>
+      :host {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        background-color: #53534a;
+        color: white;
+        padding: 6px 8px;
+        width: 100vw;
+        height: 64px;
+        left: -8px;
+        top: -8px;
+        position: relative;
+        --paper-icon-button-disabled: {
+          color: white;
+        };
+      }
+
+      h1 {
+        font-size: 20px;
+        flex-grow: 1;
+        margin: 9px 0;
+      }
+
+      iron-icon {
+        margin-right: 0.5em;
+        margin-left: 0.5em;
+        height: 30px;
+        width: 30px;
+        padding: 10px;
+      }
+
+      @media (min-width: 640px) {
+        iron-icon,
+        paper-icon-button {
+          margin-right: 1.5em;
+        }
+
+        iron-icon:first-child {
+          margin-left: 1em;
+        }
+      }
+      @media (max-width: ){
+
+      }
+
+    </style>
+    <iron-icon icon="bookmark"></iron-icon>
+    <h1>Nulli Notes</h1>
+    <iron-icon icon="cloud" hidden$="[[!online]]"></iron-icon>
+    <iron-icon icon="cloud-off" hidden$="[[online]]"></iron-icon>
+    <paper-icon-button
+        icon="[[computeLockIcon(signedIn)]]"
+        disabled="[[!signedIn]]"
+        on-tap="lock">
+    </paper-icon-button>
+  </template>
+  <script>
+    class NullinoteToolbar extends Polymer.Element {
+      static get is() { return 'nullinote-toolbar'; }
+      static get properties() {
+        return {
+          signedIn: {
+            type: Boolean,
+            reflectToAttribute: true,
+            notify: true,
+            value: false
+          },
+          online: {
+            type: Boolean,
+            notify: true,
+            value: false,
+          }
+        }
+      }
+
+      computeLockIcon(signedIn) { // Which icon to display
+        return signedIn ? 'lock-open' : 'lock';
+      }
+
+      lock() {  // Fires custom sign-out event
+        this.dispatchEvent(new CustomEvent('sign-out', {detail: {kicked: true}}));
+      }
+    }
+    window.customElements.define(NullinoteToolbar.is, NullinoteToolbar);
+  </script>
+</dom-module>

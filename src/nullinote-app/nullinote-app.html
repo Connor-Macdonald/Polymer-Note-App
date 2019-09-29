@@ -1,0 +1,237 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="nullinote-elements.html">
+
+<dom-module id="nullinote-app">
+  <template>
+    <style>
+      :host {
+        font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
+      }
+      paper-fab {
+        position: absolute;
+        bottom: 1em;
+        right: 1em;
+      }
+      nullinote-toolbar {
+        width: 100vw;
+        left: -8px;
+        z-index: 1;
+        box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+                    0 1px 10px 0 rgba(0, 0, 0, 0.12),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.4);
+      }
+      nullinote-login {
+        z-index:0;
+      }
+      paper-card {
+        padding: 10px;
+        margin: 5px;
+      }
+      .notes {
+        text-align: center;
+      }
+      [hidden] { display: none }
+    </style>
+    <nullinote-toolbar
+      online="[[online]]"
+      signed-in="[[signedIn]]"
+      on-sign-out="signOut">
+    </nullinote-toolbar>
+
+    <nullinote-login
+      on-sign-in="signIn"
+      on-sign-up="signUp"
+      disabled="[[!online]]"
+      hidden$="[[signedIn]]"
+      error-message="[[errorMessage]]">
+    </nullinote-login>
+
+    <nullinote-editor
+        id="editor"
+        note="{{editableNote}}"
+        on-close="commitChange"
+        hidden$="[[!signedIn]]">
+    </nullinote-editor>
+
+    <firebase-query
+        id="query"
+        app-name="notes"
+        path="/notes/[[user.uid]]"
+        data="{{data}}">
+    </firebase-query>
+
+    <app-indexeddb-mirror
+        id="mirror"
+        session="[[user.uid]]"
+        key="notes"
+        data="{{data}}"
+        persisted-data="{{persistedData}}">
+    </app-indexeddb-mirror>
+
+    <div class="notes">
+      <template is="dom-repeat" items="[[persistedData]]" as="note">
+        <paper-card>
+          <nullinote-note
+              id$="[[note.$key]]"
+              title="[[note.title]]"
+              body="[[note.body]]"
+              on-tap="edit"
+              on-click="edit">
+          </nullinote-note>
+        </paper-card>
+      </template>
+    </div>
+
+    <paper-fab icon="add" on-tap="create" hidden$="[[!signedIn]]"></paper-fab>
+
+    <firebase-auth
+        id="auth"
+        app-name="notes"
+        provider="google"
+        signed-in="{{signedIn}}"
+        user="{{user}}"
+        online="{{online}}">
+    </firebase-auth>
+
+    <firebase-document
+        id="document"
+        app-name="notes"
+        path="[[editableNoteId]]"
+        data="{{editableNote}}">
+    </firebase-document>
+
+  </template>
+  <script>
+    class NullinoteApp extends Polymer.Element {
+      static get is() { return 'nullinote-app'; }
+      static get properties() {
+        return {
+          signedIn: {
+            type: Boolean,
+            reflectToAttribute: true,
+            notify: true,
+            value: false
+          },
+          editableNoteId: {
+            type: String,
+            notify: true
+          },
+        };
+      }
+
+      get isEditable(){ // Can only edit when online
+        return this.online;
+      }
+
+      get notesPath(){  // Path tonote storage based on user's id
+        var path = "/notes/" + this.user.uid;
+        return path;
+      }
+
+      toEditableId(noteId) {  // Path to individuale note
+        var path = this.notesPath + '/' + noteId;
+        return path;
+      }
+
+      signIn(e) { // Handels sign-in event with firebase auth
+        if(e.detail.id=="google") // Signing in with google option
+          this.$.auth.signInWithPopup()
+          .catch(function(e){
+            console.log(e);
+            this.errorMessage = e.message;
+          }.bind(this));
+        else {  // Signing in with email and password
+          this.$.auth.signInWithEmailAndPassword(e.detail.name,e.detail.password)
+          .catch(function(e){
+            console.log(e);
+            this.errorMessage = e.message;
+          }.bind(this));
+        }
+      }
+
+      signOut(){  // Signing out
+        this.$.auth.signOut();
+        this.errorMessage = "";
+      }
+
+      signUp(e){  // Handels sign-up event with firebase auth
+        this.$.auth.createUserWithEmailAndPassword(e.detail.name,e.detail.password).then(function(){
+          console.log("Success");
+          this.$.auth.signOut();
+        }.bind(this)).catch(function(e){
+          console.log(e);
+          this.errorMessage = e.message;
+        }.bind(this));
+      }
+
+      edit(event) { // Getting the note to edit and opening it in the editor
+        if (this.isEditable) {
+          var noteElement = Polymer.dom(event).localTarget;
+          this.editableNoteId = this.toEditableId(noteElement.id);
+          console.log(this.editableNoteId);
+          this.$.document.transactionsComplete.then(function() {
+            this.$.editor.open(noteElement);
+          }.bind(this));
+        }
+      }
+
+      create() {  // Creating new not in editor
+        if (this.online) {
+          this.editableNoteId = null;
+          this.$.editor.open();
+        }
+      }
+
+      commitChange(event) { // handels custom close event and fetches new data form firebase
+        var changeCommits;
+
+        switch (event.detail) {
+          case 'save':
+            changeCommits = this.save();
+            break;
+          case 'delete':
+            changeCommits = this.delete();
+            break;
+          default:
+            changeCommits = Promise.resolve();
+            break;
+        }
+
+        if (this.$.query && this.$.query.refresh) {
+          changeCommits.then(function() {
+            this.$.query.refresh();
+          }.bind(this));
+        }
+      }
+
+      save() {  // If note if saved
+        if (this.$.document.isNew &&
+            (this.editableNote.title ||
+             this.editableNote.body)) {
+          return this.$.document.saveValue(this.notesPath).then(function() {
+            this.$.document.reset();
+          }.bind(this));
+        }
+        return Promise.resolve();
+      }
+
+      delete() {  // if note is deleted
+        if (!this.$.document.isNew) {
+          this.$.document.destroy();
+        }
+        return Promise.resolve();
+      }
+
+      makeid() {
+        var text = "offline_";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 12; i++)
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+      }
+    }
+    window.customElements.define(NullinoteApp.is, NullinoteApp);
+  </script>
+</dom-module>

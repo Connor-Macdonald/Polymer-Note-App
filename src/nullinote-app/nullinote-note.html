@@ -1,0 +1,87 @@
+<link rel="import" href="nullinote-elements.html">
+
+<dom-module id="nullinote-note">
+  <template>
+    <style>
+    :host {
+      display: block;
+      @apply --paper-font-common-base;
+    }
+
+    h1 {
+      font-size: 1.5em;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    h1:not(.hidden)+p {
+      margin-top: 1em;
+    }
+
+    p {
+      margin: 0;
+      font-family: 'Roboto Slab', Times New Roman, serif;
+      font-size: 1.2em;
+      white-space: pre-wrap;
+    }
+
+    .hidden {
+      display: none;
+    }
+    paper-input {
+      width: 80%;
+      --paper-input-container-input: {
+        font-size: 1.15em;
+      };
+    }
+    paper-textarea {
+      width: 95%
+      --paper-input-container-input: {
+        font-size: 0.9em;
+      };
+    }
+
+    </style>
+      <template is="dom-if" if="[[editable]]">
+        <paper-input label="Title" always-float-label placeholder="Tap to Edit" value="{{title}}">
+        </paper-input>
+        <paper-textarea max-rows="8" label="Body" always-float-label placeholder="Tap to Edit" value="{{body}}">
+        </paper-textarea>
+      </template>
+      <template is="dom-if" if="[[!editable]]">
+        <h1 class$="[[emptyClass(title)]]">[[title]]</h1>
+        <p class$="[[emptyClass(body)]]">[[body]]</p>
+      </template>
+
+  </template>
+  <script>
+    class NullinoteNote extends Polymer.Element {
+      static get is() { return 'nullinote-note'; }
+      static get properties() {
+        return {
+          editable: {
+            type: Boolean,
+            reflectToAttribute: true,
+            value: false
+          },
+
+          title: {
+            type: String,
+            notify: true,
+            value: ''
+          },
+
+          body: {
+            type: String,
+            notify: true,
+            value: ''
+          },
+        }
+      }
+      emptyClass(content) { // Checks if there is somthing to display or not
+        return !content ? 'hidden' : '';
+      }
+    }
+    window.customElements.define(NullinoteNote.is, NullinoteNote);
+  </script>
+</dom-module>

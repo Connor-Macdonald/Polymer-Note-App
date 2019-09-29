@@ -1,9 +1,7 @@
 # Polymer Note App
-A progressive note taking app. 
+
+A progressive web app used to take notes and view them online or offline. Built with Polymer. 
+
+This web app was built to demonstrate the consepts of Polymer and Progressive Web Apps
+
 Check it out here https://teaching-project-ce98b.firebaseapp.com/
-
-
-## Install the Polymer-CLI
-
-First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `polymer serve` to serve your application locally.
-

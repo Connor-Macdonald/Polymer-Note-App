@@ -1,0 +1,103 @@
+<link rel="import" href="nullinote-elements.html">
+
+
+<dom-module id="nullinote-login">
+  <template>
+    <style>
+      :host {
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #46c7e4;
+        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        @apply --layout;
+        @apply --layout-center-center;
+      }
+      paper-card {
+        position: relative;
+        width: 400px;
+        height: 315px;
+        padding: 20px;
+        padding-top: 10px;
+      }
+      paper-input {
+
+      }
+      paper-button {
+        background-color: #0266C8;
+        color: white;
+        margin: 6px;
+      }
+      paper-button.google {
+        background-color: rgb(221, 75, 57);
+        color: white;
+      }
+      paper-button.login {
+        width: 40%;
+      }
+      paper-button.signUp {
+        width: 30%;
+        background-color: white;
+        color: black;
+
+      }
+      hr {
+        width: 40%;
+        background-color: black;
+        border: 0;
+        height: 1px;
+      }
+      #error{
+        color: red;
+
+      }
+
+    </style>
+    <paper-card>
+      <paper-input label="Email" value="{{email}}"></paper-input>
+      <paper-input label="Password" value="{{password}}" type="password"></paper-input>
+      <span id="error">[[errorMessage]]</span>
+      <div style="display:grid; text-align: -webkit-center;margin-top:10px;">
+        <div>
+          <paper-button raised id="emailPassword" class="login" on-tap="signIn" disabled="[[disabled]]">Login</paper-button>
+          <paper-button raised id="signUp" class="signUp" on-tap="signUp" disabled="[[disabled]]">Sign Up</paper-button>
+        </div>
+        <div style="display:flex"><hr> Or <hr></div>
+        <paper-button raised id="google" class="google" on-tap="signIn" disabled="[[disabled]]">Sign in with Google+</paper-button>
+      </div>
+    </paper-card>
+  </template>
+  <script>
+  class NullinoteLogin extends Polymer.Element {
+    static get is() { return 'nullinote-login'; }
+    static get properties() {
+      return {
+        disabled: {
+          type: Boolean,
+          reflectToAttribute: true,
+          value: false
+        },
+      };
+    }
+    signIn(e){  // Fires custom sign-in event
+      var email = this.emial;
+      var pwd = this.password;
+
+      var detail = {"id":e.target.id,"name":email,"password":pwd};
+      this.dispatchEvent(new CustomEvent('sign-in', {detail: detail}));
+      this.email = "";
+      this.password = "";
+    }
+    signUp(){ // Fires custom sign-up event
+      var detail = {"name":this.email,"password":this.password};
+      this.dispatchEvent(new CustomEvent('sign-up', {detail: detail}));
+      this.email = "";
+      this.password = "";
+    }
+  }
+
+  window.customElements.define(NullinoteLogin.is, NullinoteLogin);
+  </script>
+</dom-module>
